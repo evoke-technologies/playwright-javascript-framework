@@ -1,0 +1,38 @@
+{
+  "name": "snedrive2.0webapp",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "generate-timestamp": "node generateTimestamp.js && set TIMESTAMP=$(type timestamp.txt)",
+    "test:smoke:qa": "node generateTimestamp.js && set /p TIMESTAMP=<timestamp.txt && nyc cross-env NODE_ENV=qa playwright test --grep @smoke-qa || echo 'Tests finished' && npx allure generate reports/report--%TIMESTAMP%/allure-results --clean -o reports/report--%TIMESTAMP%/allure-report && npx allure open reports/report--%TIMESTAMP%/allure-report",
+    "test:regression:qa": "node generateTimestamp.js && set /p TIMESTAMP=<timestamp.txt && nyc cross-env NODE_ENV=qa playwright test --grep \"@(smoke-qa|regression-qa)\" || echo 'Tests finished' && npx allure generate reports/report--%TIMESTAMP%/allure-results --clean -o reports/report--%TIMESTAMP%/allure-report && npx allure open reports/report--%TIMESTAMP%/allure-report",
+    "test:smoke:uat": "node generateTimestamp.js && set /p TIMESTAMP=<timestamp.txt && nyc cross-env NODE_ENV=uat playwright test --grep @smoke-uat || echo 'Tests finished' && npx allure generate reports/report--%TIMESTAMP%/allure-results --clean -o reports/report--%TIMESTAMP%/allure-report && npx allure open reports/report--%TIMESTAMP%/allure-report",
+    "test:regression:uat": "node generateTimestamp.js && set /p TIMESTAMP=<timestamp.txt && nyc cross-env NODE_ENV=uat playwright test --grep \"@(smoke-uat|regression-uat)\" || echo 'Tests finished' && npx allure generate reports/report--%TIMESTAMP%/allure-results --clean -o reports/report--%TIMESTAMP%/allure-report && npx allure open reports/report--%TIMESTAMP%/allure-report",
+    "test:smoke:prod": "node generateTimestamp.js && set /p TIMESTAMP=<timestamp.txt && nyc cross-env NODE_ENV=prod playwright test --grep @smoke-prod || echo 'Tests finished' && npx allure generate reports/report--%TIMESTAMP%/allure-results --clean -o reports/report--%TIMESTAMP%/allure-report && npx allure open reports/report--%TIMESTAMP%/allure-report",
+    "test:regression:prod": "node generateTimestamp.js && set /p TIMESTAMP=<timestamp.txt && nyc cross-env NODE_ENV=prod playwright test --grep \"@(smoke-prod|regression-prod)\" || echo 'Tests finished' && npx allure generate reports/report--%TIMESTAMP%/allure-results --clean -o reports/report--%TIMESTAMP%/allure-report && npx allure open reports/report--%TIMESTAMP%/allure-report"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@alex_neo/playwright-azure-reporter": "^1.8.0",
+    "axios": "^1.5.1",
+    "azure-devops-node-api": "^12.3.0",
+    "cheerio": "^1.0.0-rc.12",
+    "fs": "^0.0.1-security",
+    "https": "^1.0.0",
+    "moment": "^2.30.1",
+    "playwright": "^1.50.0",
+    "request": "^2.88.2"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.50.0",
+    "allure-js-commons": "^3.0.9",
+    "allure-playwright": "^3.0.9",
+    "cross-env": "^7.0.3",
+    "dotenv": "^16.4.5",
+    "mocha": "^10.2.0",
+    "nyc": "^15.1.0"
+  }
+}

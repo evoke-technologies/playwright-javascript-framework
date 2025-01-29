@@ -1,0 +1,69 @@
+trigger:
+  branches:
+    include:
+      - none
+pool:
+  vmImage: 'ubuntu-latest'
+
+stages:
+  - stage: QA
+    displayName: 'Run Playwright Tests for QA Environment'
+    jobs:
+      - job: RunTestsQA
+        displayName: 'Running Playwright Smoke Tests'
+        steps:
+          - script: npm ci
+            displayName: 'Install Dependencies'
+            workingDirectory: $(Build.SourcesDirectory)
+          
+          - script: |
+            echo "Build.SourcesDirectory: $(Build.SourcesDirectory)"
+            ls -la $(Build.SourcesDirectory)
+            displayName: 'Print Build.SourcesDirectory'
+
+
+        # - script: echo "##vso[task.setvariable variable=AZURE_TOKEN;issecret=true]$(AZURE_TOKEN)"
+        #  - script: echo "##vso[task.setvariable variable=AZURE_TOKEN;issecret=true]qzy3lu67no3lxshoopa42shyfe7jpea63vcn22rdnv3dejta5soq"
+        #    displayName: Set ADO Token env var for Azure Test Plans reporter
+
+          - script: npx playwright install --with-deps
+            displayName: 'Install Playwright'
+            workingDirectory: $(Build.SourcesDirectory)
+
+          - script: npm run test:smoke:qa
+            displayName: 'Run Playwright Smoke Tests'
+            workingDirectory: $(Build.SourcesDirectory)
+
+          - task: PublishTestResults@2
+            displayName: 'Publish JUnit Report'
+            inputs:
+              searchFolder: 'test-results'
+              testResultsFormat: 'JUnit'  
+              testResultsFiles: '**/test-results.xml' 
+              mergeTestResults: true
+              failTaskOnFailedTests: true
+              testRunTitle: 'QA Playwright Smoke Test'
+            condition: succeededOrFailed()
+
+          - task: PublishPipelineArtifact@1
+            displayName: 'Publish HTML Report'
+            inputs:
+              targetPath: $(Build.SourcesDirectory)/test-results/html/index.html
+              artifact: playwright-report
+              publishLocation: 'pipeline'
+            condition: succeededOrFailed()
+
+          - task: PublishCodeCoverageResults@1
+            displayName: 'Publish Code Coverage Results'
+            inputs:
+              codeCoverageTool: 'Cobertura'
+              summaryFileLocation: $(Build.SourcesDirectory)/coverage/cobertura-coverage.xml
+              pathToSources: $(Build.SourcesDirectory)/coverage
+            condition: succeededOrFailed()
+
+          - task: PublishAllureReport@1
+            displayName: 'Publish Allure Report'
+            inputs:
+              testResultsDir: '$(Build.SourcesDirectory)/reports/allure-results'
+              reportName: 'Allure-Report'
+            condition: always()
